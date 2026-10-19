@@ -141,3 +141,85 @@
         </div>
     </div>
 @stop()
+@section('js')
+    <script>
+        document.getElementById('formularioBootstrap').addEventListener('submit', function(e) {
+            e.preventDefault(); // Previene la recarga de la página
+
+            // Captura de valores
+            const nombres = document.getElementById('nombres').value;
+            const apellidos = document.getElementById('apellidos').value;
+            const fecha = document.getElementById('fechaNacimiento').value;
+            const ninos = document.getElementById('ninos').value;
+            const madre = document.querySelector('input[name="madre_cabeza"]:checked').value;
+            const estudio = document.querySelector('input[name="estudio"]:checked').value;
+
+            // Captura de múltiples checkboxes
+            const generosSeleccionados = [];
+            document.querySelectorAll('input[name="generos[]"]:checked').forEach(cb => {
+                generosSeleccionados.push(cb.value);
+            });
+
+            const generosTexto = generosSeleccionados.length > 0 ?
+                generosSeleccionados.join(', ') : 'Ninguno seleccionado';
+
+            // Estructura de datos a presentar
+            const respuestas = [
+                ['Nombres', nombres],
+                ['Apellidos', apellidos],
+                ['Fecha de nacimiento', fecha],
+                ['Cantidad de niños a cargo', ninos],
+                ['Madre cabeza de familia', madre],
+                ['Está realizando técnico/tecnólogo', estudio],
+                ['Géneros de cine preferidos', generosTexto]
+            ];
+
+            // Renderizado dinámico en el DOM
+            const contenidoResultados = document.getElementById('contenidoResultados');
+            contenidoResultados.replaceChildren(...respuestas.map(([etiqueta, valor]) => {
+                const parrafo = document.createElement('p');
+                const titulo = document.createElement('strong');
+                titulo.textContent = `${etiqueta}:`;
+                parrafo.append(titulo, ` ${valor}`);
+                return parrafo;
+            }));
+
+            // Muestra el contenedor y desplaza la vista hacia los resultados
+            document.getElementById('resultados').style.display = 'block';
+            document.getElementById('resultados').scrollIntoView({
+                behavior: 'smooth'
+            });
+
+            // Guarda el registro en la base de datos (RegistroController@store) sin recargar la página
+            guardarRegistro(this);
+        });
+
+        function guardarRegistro(formulario) {
+            const estado = document.createElement('div');
+            estado.className = 'alert alert-secondary mt-3 mb-0';
+            estado.textContent = 'Guardando en la base de datos...';
+            document.getElementById('contenidoResultados').append(estado);
+
+            fetch(formulario.action, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: new FormData(formulario)
+            })
+            .then(respuesta => respuesta.json().then(datos => ({ ok: respuesta.ok, datos })))
+            .then(({ ok, datos }) => {
+                if (ok) {
+                    estado.className = 'alert alert-success mt-3 mb-0';
+                    estado.textContent = `${datos.message} (ID ${datos.id})`;
+                    formulario.reset();
+                } else {
+                    estado.className = 'alert alert-danger mt-3 mb-0';
+                    estado.textContent = Object.values(datos.errors || {}).flat().join(' ') || 'No se pudo guardar el registro.';
+                }
+            })
+            .catch(() => {
+                estado.className = 'alert alert-danger mt-3 mb-0';
+                estado.textContent = 'Error de conexión con el servidor.';
+            });
+        }
+    </script>
+@stop()
