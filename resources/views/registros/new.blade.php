@@ -220,7 +220,6 @@
                 if (ok) {
                     estado.className = 'alert alert-success mt-3 mb-0';
                     estado.textContent = `${datos.message} (ID ${datos.id})`;
-                    formulario.reset();
                 } else {
                     estado.className = 'alert alert-danger mt-3 mb-0';
                     estado.textContent = Object.values(datos.errors || {}).flat().join(' ') || 'No se pudo guardar el registro.';
