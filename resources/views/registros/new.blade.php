@@ -15,7 +15,7 @@
 
                 <div class="card finance-card">
                     <div class="card-body p-4">
-                        <!-- action, method y @csrf siguen la guía MercadoSENA: el formulario apunta a RegistroController@store -->
+                        <!-- action, method y token CSRF siguen la guía MercadoSENA: el formulario apunta a RegistroController::store -->
                         <form id="formularioBootstrap" action="{{ url('registros') }}" method="post">
                             @csrf
                             <!-- Nombres -->
