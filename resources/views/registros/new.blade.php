@@ -142,9 +142,19 @@
     </div>
 @stop()
 @section('js')
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="{{ url('js/jquery.validate.min.js') }}"></script>
+    <script src="{{ url('js/localization/messages_es.min.js') }}"></script>
+    @include('registros.validacion')
+
     <script>
         document.getElementById('formularioBootstrap').addEventListener('submit', function(e) {
             e.preventDefault(); // Previene la recarga de la página
+
+            // Validación en el cliente (jQuery Validate): si hay errores no se continúa
+            if (!$(this).valid()) {
+                return;
+            }
 
             // Captura de valores
             const nombres = document.getElementById('nombres').value;
